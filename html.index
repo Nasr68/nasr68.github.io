@@ -1,0 +1,1067 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#f6efdf" />
+  <meta
+    name="description"
+    content="Prototype for a minimal Arabic-style thobe store featuring one product: the classic white thobe."
+  />
+  <title>دار الثوب | Prototype 01</title>
+  <style>
+    :root {
+      --bg: #f6efdf;
+      --bg-deep: #ead9b8;
+      --surface: rgba(255, 252, 245, 0.82);
+      --surface-strong: #fffdf8;
+      --ink: #1e1914;
+      --muted: #6e6255;
+      --accent: #8f6a2d;
+      --accent-strong: #5d441d;
+      --accent-soft: #d8bf95;
+      --forest: #1f3329;
+      --line: rgba(76, 58, 34, 0.12);
+      --shadow: 0 22px 70px rgba(92, 70, 38, 0.12);
+      --radius-xl: 32px;
+      --radius-lg: 24px;
+      --radius-md: 18px;
+      --font-display: "Geeza Pro", "Noto Naskh Arabic", "Al Nile", "Times New Roman", serif;
+      --font-body: "Avenir Next", "Segoe UI", Tahoma, sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at top right, rgba(255, 255, 255, 0.8), transparent 28%),
+        radial-gradient(circle at left 15%, rgba(217, 191, 149, 0.45), transparent 26%),
+        linear-gradient(180deg, #fbf6ec 0%, var(--bg) 40%, #f2e5ce 100%);
+      font-family: var(--font-body);
+      -webkit-font-smoothing: antialiased;
+      text-rendering: optimizeLegibility;
+      overflow-x: hidden;
+    }
+
+    body::before,
+    body::after {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: -1;
+    }
+
+    body::before {
+      background:
+        linear-gradient(45deg, transparent 46.5%, rgba(143, 106, 45, 0.045) 47%, rgba(143, 106, 45, 0.045) 53%, transparent 53.5%) 0 0 / 84px 84px,
+        linear-gradient(-45deg, transparent 46.5%, rgba(143, 106, 45, 0.035) 47%, rgba(143, 106, 45, 0.035) 53%, transparent 53.5%) 0 0 / 84px 84px;
+      opacity: 0.4;
+    }
+
+    body::after {
+      background: radial-gradient(circle at 50% 0%, rgba(255, 255, 255, 0.9), transparent 34%);
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    button,
+    input {
+      font: inherit;
+    }
+
+    button {
+      border: 0;
+      cursor: pointer;
+    }
+
+    .shell {
+      width: min(1180px, calc(100% - 32px));
+      margin: 0 auto;
+    }
+
+    .site-header {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      padding-top: 18px;
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 16px 22px;
+      border: 1px solid rgba(255, 255, 255, 0.42);
+      border-radius: 999px;
+      background: rgba(255, 252, 245, 0.72);
+      backdrop-filter: blur(16px);
+      box-shadow: 0 16px 40px rgba(94, 72, 40, 0.08);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .brand-mark {
+      width: 54px;
+      height: 54px;
+      border-radius: 18px;
+      display: grid;
+      place-items: center;
+      background:
+        radial-gradient(circle at 30% 30%, #dcbc86, transparent 38%),
+        linear-gradient(135deg, #4f3b19, #9c7635);
+      color: #fff7ea;
+      font-family: var(--font-display);
+      font-size: 1.05rem;
+      letter-spacing: 0.08em;
+      box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.24);
+    }
+
+    .brand-text strong,
+    .hero-copy h1,
+    .section-title,
+    .product-title {
+      font-family: var(--font-display);
+      font-weight: 700;
+    }
+
+    .brand-text {
+      display: grid;
+      gap: 4px;
+    }
+
+    .brand-text strong {
+      font-size: 1.15rem;
+      letter-spacing: 0.04em;
+    }
+
+    .brand-text span {
+      color: var(--muted);
+      font-size: 0.92rem;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      color: var(--muted);
+      font-size: 0.95rem;
+    }
+
+    .nav-links a {
+      padding: 8px 12px;
+      border-radius: 999px;
+      transition: background-color 160ms ease, color 160ms ease, transform 160ms ease;
+    }
+
+    .nav-links a:hover {
+      background: rgba(143, 106, 45, 0.08);
+      color: var(--accent-strong);
+      transform: translateY(-1px);
+    }
+
+    .bag-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 14px;
+      border-radius: 999px;
+      background: rgba(35, 51, 41, 0.92);
+      color: #f8f1e3;
+      white-space: nowrap;
+    }
+
+    .bag-count {
+      min-width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      background: rgba(255, 255, 255, 0.14);
+      font-weight: 700;
+    }
+
+    main {
+      padding: 34px 0 56px;
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, 1.08fr) minmax(340px, 0.92fr);
+      gap: 28px;
+      align-items: stretch;
+    }
+
+    .panel {
+      position: relative;
+      border: 1px solid rgba(255, 255, 255, 0.56);
+      border-radius: var(--radius-xl);
+      background: var(--surface);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(18px);
+      overflow: hidden;
+    }
+
+    .hero-copy {
+      padding: 42px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 28px;
+    }
+
+    .hero-copy::before {
+      content: "";
+      position: absolute;
+      inset: 0 auto auto 0;
+      width: 240px;
+      height: 240px;
+      background: radial-gradient(circle, rgba(216, 191, 149, 0.22), transparent 68%);
+      pointer-events: none;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      width: fit-content;
+      padding: 10px 14px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.74);
+      color: var(--accent-strong);
+      border: 1px solid rgba(143, 106, 45, 0.12);
+      font-size: 0.92rem;
+    }
+
+    .eyebrow::before {
+      content: "01";
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      background: rgba(143, 106, 45, 0.12);
+      font-size: 0.78rem;
+      font-weight: 700;
+    }
+
+    .hero-copy h1 {
+      margin: 0;
+      font-size: clamp(2.6rem, 6vw, 5.1rem);
+      line-height: 0.95;
+      letter-spacing: -0.03em;
+    }
+
+    .hero-copy p {
+      margin: 0;
+      max-width: 52ch;
+      color: var(--muted);
+      font-size: 1.05rem;
+      line-height: 1.85;
+    }
+
+    .hero-actions {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      flex-wrap: wrap;
+    }
+
+    .button-primary,
+    .button-secondary {
+      padding: 14px 22px;
+      border-radius: 999px;
+      transition: transform 180ms ease, box-shadow 180ms ease, background-color 180ms ease;
+    }
+
+    .button-primary {
+      background: linear-gradient(135deg, var(--accent), #c9a062);
+      color: #fffaf2;
+      box-shadow: 0 12px 28px rgba(143, 106, 45, 0.22);
+    }
+
+    .button-secondary {
+      background: rgba(255, 255, 255, 0.7);
+      color: var(--accent-strong);
+      border: 1px solid rgba(143, 106, 45, 0.12);
+    }
+
+    .button-primary:hover,
+    .button-secondary:hover,
+    .size-chip:hover,
+    .qty-button:hover,
+    .cta-button:hover {
+      transform: translateY(-2px);
+    }
+
+    .facts {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .fact-card {
+      padding: 16px 18px;
+      border-radius: var(--radius-md);
+      background: rgba(255, 255, 255, 0.58);
+      border: 1px solid rgba(143, 106, 45, 0.08);
+    }
+
+    .fact-card span {
+      display: block;
+      color: var(--muted);
+      font-size: 0.85rem;
+      margin-bottom: 10px;
+    }
+
+    .fact-card strong {
+      font-size: 1.05rem;
+      font-family: var(--font-display);
+    }
+
+    .hero-showcase {
+      padding: 24px;
+      display: flex;
+      align-items: stretch;
+      justify-content: center;
+    }
+
+    .showcase-shell {
+      position: relative;
+      width: 100%;
+      min-height: 100%;
+      padding: 28px;
+      border-radius: calc(var(--radius-xl) - 8px);
+      background:
+        radial-gradient(circle at top, rgba(255, 255, 255, 0.92), rgba(255, 249, 239, 0.64) 38%, rgba(234, 217, 184, 0.8) 100%);
+      border: 1px solid rgba(143, 106, 45, 0.1);
+      overflow: hidden;
+      display: grid;
+      place-items: center;
+    }
+
+    .showcase-shell::before,
+    .showcase-shell::after {
+      content: "";
+      position: absolute;
+      border-radius: 50%;
+      opacity: 0.5;
+    }
+
+    .showcase-shell::before {
+      width: 260px;
+      height: 260px;
+      inset: 18px auto auto 18px;
+      background: radial-gradient(circle, rgba(216, 191, 149, 0.42), transparent 68%);
+    }
+
+    .showcase-shell::after {
+      width: 180px;
+      height: 180px;
+      inset: auto 22px 18px auto;
+      background: radial-gradient(circle, rgba(31, 51, 41, 0.14), transparent 70%);
+    }
+
+    .showcase-badge,
+    .price-tag {
+      position: absolute;
+      border-radius: 999px;
+      background: rgba(255, 253, 248, 0.84);
+      border: 1px solid rgba(143, 106, 45, 0.12);
+      backdrop-filter: blur(10px);
+      box-shadow: 0 10px 28px rgba(113, 86, 49, 0.1);
+    }
+
+    .showcase-badge {
+      top: 20px;
+      right: 20px;
+      padding: 10px 14px;
+      color: var(--accent-strong);
+      font-size: 0.9rem;
+    }
+
+    .price-tag {
+      left: 20px;
+      bottom: 20px;
+      padding: 16px 18px;
+      min-width: 118px;
+    }
+
+    .price-tag span {
+      display: block;
+      color: var(--muted);
+      font-size: 0.82rem;
+      margin-bottom: 4px;
+    }
+
+    .price-tag strong {
+      font-size: 1.75rem;
+      font-family: var(--font-display);
+      color: var(--forest);
+    }
+
+    .thobe-visual {
+      position: relative;
+      z-index: 1;
+      width: min(100%, 400px);
+      filter: drop-shadow(0 28px 38px rgba(77, 60, 36, 0.15));
+    }
+
+    .detail-section {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 360px;
+      gap: 28px;
+      margin-top: 28px;
+    }
+
+    .product-copy,
+    .order-panel,
+    .note-card {
+      padding: 34px;
+    }
+
+    .section-label {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: rgba(143, 106, 45, 0.08);
+      color: var(--accent-strong);
+      font-size: 0.88rem;
+      margin-bottom: 18px;
+    }
+
+    .section-title {
+      margin: 0 0 14px;
+      font-size: clamp(2rem, 3vw, 3rem);
+      line-height: 1.05;
+      letter-spacing: -0.03em;
+    }
+
+    .product-copy > p {
+      margin: 0 0 26px;
+      color: var(--muted);
+      line-height: 1.95;
+      max-width: 58ch;
+    }
+
+    .spec-grid,
+    .note-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .spec-card,
+    .note-item {
+      padding: 18px;
+      border-radius: var(--radius-md);
+      background: rgba(255, 255, 255, 0.62);
+      border: 1px solid rgba(143, 106, 45, 0.08);
+    }
+
+    .spec-card span,
+    .note-item span {
+      display: block;
+      color: var(--muted);
+      font-size: 0.86rem;
+      margin-bottom: 10px;
+    }
+
+    .product-title {
+      margin: 0;
+      font-size: 2rem;
+      line-height: 1.1;
+    }
+
+    .product-price {
+      margin: 8px 0 22px;
+      color: var(--forest);
+      font-size: 1.9rem;
+      font-family: var(--font-display);
+    }
+
+    .order-panel {
+      display: grid;
+      gap: 18px;
+      align-content: start;
+      background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.82), rgba(255, 250, 240, 0.78)),
+        var(--surface);
+    }
+
+    .field-label {
+      font-size: 0.88rem;
+      color: var(--muted);
+      margin-bottom: 10px;
+    }
+
+    .size-list {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .size-chip,
+    .qty-button {
+      padding: 12px 16px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.72);
+      color: var(--ink);
+      border: 1px solid rgba(143, 106, 45, 0.12);
+      transition: transform 180ms ease, background-color 180ms ease, border-color 180ms ease, color 180ms ease;
+    }
+
+    .size-chip.is-active {
+      background: linear-gradient(135deg, var(--accent), #c8a066);
+      color: #fffaf3;
+      border-color: transparent;
+      box-shadow: 0 12px 28px rgba(143, 106, 45, 0.18);
+    }
+
+    .qty-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      padding: 12px 14px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.72);
+      border: 1px solid rgba(143, 106, 45, 0.12);
+    }
+
+    .qty-controls {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .qty-button {
+      width: 42px;
+      height: 42px;
+      padding: 0;
+      display: grid;
+      place-items: center;
+      font-size: 1.1rem;
+    }
+
+    .qty-value {
+      min-width: 28px;
+      text-align: center;
+      font-weight: 700;
+      font-size: 1rem;
+    }
+
+    .selection-box {
+      padding: 16px 18px;
+      border-radius: var(--radius-md);
+      background: rgba(31, 51, 41, 0.92);
+      color: #f5ecdc;
+    }
+
+    .selection-box span {
+      display: block;
+      color: rgba(245, 236, 220, 0.66);
+      font-size: 0.82rem;
+      margin-bottom: 10px;
+    }
+
+    .selection-box strong {
+      display: block;
+      font-size: 1.08rem;
+      line-height: 1.7;
+    }
+
+    .cta-button {
+      width: 100%;
+      padding: 16px 18px;
+      border-radius: 999px;
+      background: linear-gradient(135deg, var(--accent), #c9a062);
+      color: #fffaf2;
+      box-shadow: 0 16px 30px rgba(143, 106, 45, 0.22);
+      transition: transform 180ms ease, box-shadow 180ms ease;
+    }
+
+    .cta-button:active {
+      transform: translateY(0);
+    }
+
+    .micro-copy {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.8;
+      font-size: 0.95rem;
+    }
+
+    .status-panel {
+      min-height: 72px;
+      padding: 16px 18px;
+      border-radius: var(--radius-md);
+      background: rgba(255, 255, 255, 0.66);
+      border: 1px dashed rgba(143, 106, 45, 0.28);
+      color: var(--accent-strong);
+      display: grid;
+      align-items: center;
+      line-height: 1.8;
+    }
+
+    .note-card {
+      margin-top: 28px;
+    }
+
+    .note-grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .note-item strong {
+      display: block;
+      font-family: var(--font-display);
+      font-size: 1.02rem;
+    }
+
+    .site-footer {
+      margin-top: 28px;
+      padding: 22px 26px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+      color: var(--muted);
+    }
+
+    .site-footer strong {
+      color: var(--ink);
+      font-family: var(--font-display);
+    }
+
+    @media (max-width: 1024px) {
+      .hero,
+      .detail-section {
+        grid-template-columns: 1fr;
+      }
+
+      .hero-showcase {
+        min-height: 520px;
+      }
+
+      .spec-grid,
+      .note-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 720px) {
+      .shell {
+        width: min(100% - 18px, 100%);
+      }
+
+      .topbar,
+      .hero-copy,
+      .product-copy,
+      .order-panel,
+      .note-card {
+        padding: 22px;
+      }
+
+      .topbar {
+        border-radius: 28px;
+      }
+
+      .hero-copy h1 {
+        font-size: clamp(2.3rem, 12vw, 3.5rem);
+      }
+
+      .hero-actions,
+      .nav-links {
+        width: 100%;
+      }
+
+      .nav-links a,
+      .button-primary,
+      .button-secondary {
+        flex: 1 1 calc(50% - 7px);
+        text-align: center;
+      }
+
+      .facts,
+      .spec-grid,
+      .note-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .hero-showcase {
+        min-height: auto;
+      }
+
+      .showcase-shell {
+        padding: 18px;
+      }
+
+      .thobe-visual {
+        width: min(100%, 320px);
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="site-header shell">
+    <div class="topbar">
+      <div class="brand">
+        <div class="brand-mark">دار</div>
+        <div class="brand-text">
+          <strong>دار الثوب</strong>
+          <span>واجهة أولية لمنتج واحد بطابع عربي بسيط</span>
+        </div>
+      </div>
+
+      <nav class="nav-links" aria-label="Primary">
+        <a href="#product">المنتج</a>
+        <a href="#details">التفاصيل</a>
+        <a href="#notes">لماذا هذا التصميم</a>
+        <div class="bag-pill" aria-live="polite">
+          <span>السلة</span>
+          <div class="bag-count" id="bag-count">٠</div>
+        </div>
+      </nav>
+    </div>
+  </header>
+
+  <main class="shell">
+    <section class="hero" aria-labelledby="hero-title">
+      <article class="panel hero-copy">
+        <div>
+          <div class="eyebrow">نسخة تجريبية قابلة للتطوير معنا خطوة بخطوة</div>
+          <h1 id="hero-title">الثوب الأبيض<br />الكلاسيكي</h1>
+        </div>
+
+        <p>
+          متجر بسيط يركز على قطعة واحدة فقط: ثوب أبيض أنيق بقصة مستقيمة ولمسة هادئة
+          مستلهمة من الذوق العربي المعاصر. الواجهة خفيفة وواضحة حتى نبني الأساس أولاً،
+          ثم نطوره معاً في المرحلة التالية.
+        </p>
+
+        <div class="hero-actions">
+          <a class="button-primary" href="#product">ابدأ الطلب</a>
+          <a class="button-secondary" href="#notes">استكشف الفكرة</a>
+        </div>
+
+        <div class="facts">
+          <div class="fact-card">
+            <span>اللون</span>
+            <strong>أبيض صافي</strong>
+          </div>
+          <div class="fact-card">
+            <span>القصّة</span>
+            <strong>Classic Straight Fit</strong>
+          </div>
+          <div class="fact-card">
+            <span>الطابع</span>
+            <strong>Minimal Arabic Luxury</strong>
+          </div>
+        </div>
+      </article>
+
+      <aside class="panel hero-showcase" aria-label="عرض المنتج">
+        <div class="showcase-shell">
+          <div class="showcase-badge">White Thobe / Edition 01</div>
+
+          <svg class="thobe-visual" viewBox="0 0 420 560" role="img" aria-label="رسم توضيحي لثوب أبيض كلاسيكي">
+            <defs>
+              <linearGradient id="fabric" x1="0%" y1="0%" x2="0%" y2="100%">
+                <stop offset="0%" stop-color="#ffffff" />
+                <stop offset="48%" stop-color="#fcfaf4" />
+                <stop offset="100%" stop-color="#ece4d4" />
+              </linearGradient>
+              <linearGradient id="shadow" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="rgba(174,151,112,0.15)" />
+                <stop offset="100%" stop-color="rgba(122,97,54,0.04)" />
+              </linearGradient>
+              <filter id="softShadow" x="-20%" y="-20%" width="140%" height="160%">
+                <feDropShadow dx="0" dy="20" stdDeviation="14" flood-color="rgba(77,60,36,0.16)" />
+              </filter>
+            </defs>
+
+            <ellipse cx="210" cy="500" rx="112" ry="28" fill="rgba(94,72,40,0.08)" />
+            <ellipse cx="210" cy="510" rx="78" ry="12" fill="rgba(31,51,41,0.06)" />
+
+            <g filter="url(#softShadow)">
+              <path
+                d="M165 110
+                   Q174 84 210 80
+                   Q246 84 255 110
+                   L304 154
+                   Q323 170 317 194
+                   L290 266
+                   L319 450
+                   Q324 488 291 494
+                   L129 494
+                   Q96 488 101 450
+                   L130 266
+                   L103 194
+                   Q97 170 116 154
+                   Z"
+                fill="url(#fabric)"
+                stroke="rgba(157,129,84,0.18)"
+                stroke-width="2"
+              />
+              <path
+                d="M173 114
+                   Q182 96 210 94
+                   Q238 96 247 114
+                   L285 150
+                   Q292 156 288 168
+                   L264 222
+                   L274 448
+                   Q275 470 257 472
+                   L163 472
+                   Q145 470 146 448
+                   L156 222
+                   L132 168
+                   Q128 156 135 150
+                   Z"
+                fill="rgba(255,255,255,0.42)"
+              />
+              <path
+                d="M202 95
+                   Q210 89 218 95
+                   L224 114
+                   L196 114
+                   Z"
+                fill="#efe6d4"
+              />
+              <path
+                d="M191 110
+                   H229
+                   Q235 110 235 116
+                   V132
+                   H185
+                   V116
+                   Q185 110 191 110
+                   Z"
+                fill="#fffaf2"
+                stroke="rgba(157,129,84,0.16)"
+                stroke-width="1.2"
+              />
+              <path d="M210 132 V456" stroke="rgba(162,134,89,0.28)" stroke-width="1.8" stroke-dasharray="2 6" />
+              <circle cx="210" cy="176" r="3.5" fill="rgba(147,112,58,0.35)" />
+              <circle cx="210" cy="198" r="3.5" fill="rgba(147,112,58,0.35)" />
+              <circle cx="210" cy="220" r="3.5" fill="rgba(147,112,58,0.35)" />
+              <path d="M131 183 L92 270 Q87 282 95 286 L117 293 Q128 296 132 284 L152 220" fill="#f7f1e4" />
+              <path d="M289 183 L328 270 Q333 282 325 286 L303 293 Q292 296 288 284 L268 220" fill="#f7f1e4" />
+              <rect x="88" y="282" width="31" height="14" rx="7" fill="#ece2cf" />
+              <rect x="301" y="282" width="31" height="14" rx="7" fill="#ece2cf" />
+              <path d="M157 224 Q168 214 179 224" stroke="rgba(145,111,58,0.14)" stroke-width="3" fill="none" />
+              <path d="M241 224 Q252 214 263 224" stroke="rgba(145,111,58,0.14)" stroke-width="3" fill="none" />
+              <path d="M176 266 Q194 286 210 266 Q226 286 244 266" fill="url(#shadow)" opacity="0.45" />
+            </g>
+          </svg>
+
+          <div class="price-tag">
+            <span>السعر المبدئي</span>
+            <strong>٣٢٠ ر.س</strong>
+          </div>
+        </div>
+      </aside>
+    </section>
+
+    <section class="detail-section" id="product">
+      <article class="panel product-copy" id="details">
+        <div class="section-label">منتج واحد، تجربة واضحة</div>
+        <h2 class="section-title">واجهة تبيع الثوب بهدوء وثقة</h2>
+        <p>
+          هذا النموذج يركز على تقديم الثوب الأبيض الكلاسيكي بدون تشتيت. اعتمدت على
+          مساحة بيضاء واسعة، ألوان رملية خفيفة، وزخارف هندسية ناعمة حتى نحافظ على
+          الطابع العربي من غير ازدحام. كل شيء هنا قابل للتطوير لاحقاً: الصور، الدفع،
+          السلة الكاملة، قسم المقاسات، وتجربة الهواتف بشكل أعمق.
+        </p>
+
+        <div class="spec-grid">
+          <div class="spec-card">
+            <span>الخامة</span>
+            <strong>قماش ناعم بانسيابية يومية ومظهر نظيف</strong>
+          </div>
+          <div class="spec-card">
+            <span>التفصيل</span>
+            <strong>ياقة مرتبة وأكمام هادئة بخط مستقيم</strong>
+          </div>
+          <div class="spec-card">
+            <span>الاستخدام</span>
+            <strong>مناسب للمناسبات الخفيفة واللبس اليومي الأنيق</strong>
+          </div>
+        </div>
+      </article>
+
+      <aside class="panel order-panel" aria-labelledby="order-title">
+        <div>
+          <h2 class="product-title" id="order-title">الثوب الأبيض الكلاسيكي</h2>
+          <div class="product-price">٣٢٠ ر.س</div>
+          <p class="micro-copy">
+            النموذج الحالي يحاكي صفحة شراء سريعة لمنتج واحد. اختر المقاس والكمية ثم أضف
+            المنتج إلى السلة كتجربة أولية.
+          </p>
+        </div>
+
+        <div>
+          <div class="field-label">اختر المقاس</div>
+          <div class="size-list" role="list">
+            <button class="size-chip is-active" type="button" data-size="52" aria-pressed="true">52</button>
+            <button class="size-chip" type="button" data-size="54" aria-pressed="false">54</button>
+            <button class="size-chip" type="button" data-size="56" aria-pressed="false">56</button>
+            <button class="size-chip" type="button" data-size="58" aria-pressed="false">58</button>
+          </div>
+        </div>
+
+        <div>
+          <div class="field-label">الكمية</div>
+          <div class="qty-row">
+            <span>عدد القطع</span>
+            <div class="qty-controls">
+              <button class="qty-button" type="button" id="increase-qty" aria-label="زيادة الكمية">+</button>
+              <div class="qty-value" id="quantity-value">١</div>
+              <button class="qty-button" type="button" id="decrease-qty" aria-label="تقليل الكمية">−</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="selection-box">
+          <span>الاختيار الحالي</span>
+          <strong id="selection-preview">الثوب الأبيض الكلاسيكي / مقاس 52 / قطعة 1</strong>
+        </div>
+
+        <button class="cta-button" type="button" id="add-to-bag">أضف إلى السلة</button>
+
+        <div class="status-panel" id="status-panel" aria-live="polite">
+          جاهز للتطوير: حالياً هذه تجربة بسيطة للسلة حتى نتفق على الاتجاه العام قبل
+          إضافة باقي الصفحات والخصائص.
+        </div>
+      </aside>
+    </section>
+
+    <section class="panel note-card" id="notes">
+      <div class="section-label">اتجاه التصميم</div>
+      <h2 class="section-title">لماذا هذا الأسلوب مناسب للبداية؟</h2>
+
+      <div class="note-grid">
+        <div class="note-item">
+          <span>الهوية</span>
+          <strong>العربية تظهر في الإيقاع البصري والاتجاه لا في الزخرفة الثقيلة فقط</strong>
+        </div>
+        <div class="note-item">
+          <span>التركيز</span>
+          <strong>بما أن لدينا منتجاً واحداً، فالواجهة تخدم قرار الشراء مباشرة</strong>
+        </div>
+        <div class="note-item">
+          <span>القابلية للتوسع</span>
+          <strong>يمكن لاحقاً إضافة صور حقيقية، تقييمات، بوابة دفع، ومزيد من المنتجات</strong>
+        </div>
+      </div>
+    </section>
+
+    <footer class="panel site-footer">
+      <div>
+        <strong>دار الثوب</strong>
+        <div>Prototype 01 for a focused single-product storefront.</div>
+      </div>
+      <div>© <span id="current-year"></span> قابل للتطوير معاً في الخطوة القادمة</div>
+    </footer>
+  </main>
+
+  <script>
+    const formatter = new Intl.NumberFormat("ar-SA", { useGrouping: false });
+    const bagCount = document.getElementById("bag-count");
+    const quantityValue = document.getElementById("quantity-value");
+    const selectionPreview = document.getElementById("selection-preview");
+    const statusPanel = document.getElementById("status-panel");
+    const sizeButtons = Array.from(document.querySelectorAll("[data-size]"));
+    const addToBagButton = document.getElementById("add-to-bag");
+    const increaseQtyButton = document.getElementById("increase-qty");
+    const decreaseQtyButton = document.getElementById("decrease-qty");
+    const currentYear = document.getElementById("current-year");
+
+    let selectedSize = "52";
+    let selectedQuantity = 1;
+    let bagItems = 0;
+
+    function formatNumber(value) {
+      return formatter.format(value);
+    }
+
+    function updateSelectionPreview() {
+      quantityValue.textContent = formatNumber(selectedQuantity);
+      selectionPreview.textContent =
+        `الثوب الأبيض الكلاسيكي / مقاس ${selectedSize} / قطعة ${formatNumber(selectedQuantity)}`;
+    }
+
+    function updateSizeSelection(nextSize) {
+      selectedSize = nextSize;
+
+      sizeButtons.forEach((button) => {
+        const isActive = button.dataset.size === nextSize;
+        button.classList.toggle("is-active", isActive);
+        button.setAttribute("aria-pressed", String(isActive));
+      });
+
+      updateSelectionPreview();
+      statusPanel.textContent = `تم اختيار المقاس ${nextSize}. يمكنك الآن تحديد الكمية أو إضافة المنتج إلى السلة.`;
+    }
+
+    sizeButtons.forEach((button) => {
+      button.addEventListener("click", () => updateSizeSelection(button.dataset.size));
+    });
+
+    increaseQtyButton.addEventListener("click", () => {
+      selectedQuantity += 1;
+      updateSelectionPreview();
+      statusPanel.textContent = `تم تحديث الكمية إلى ${formatNumber(selectedQuantity)}.`;
+    });
+
+    decreaseQtyButton.addEventListener("click", () => {
+      if (selectedQuantity === 1) {
+        statusPanel.textContent = "الحد الأدنى للطلب في هذا النموذج هو قطعة واحدة.";
+        return;
+      }
+
+      selectedQuantity -= 1;
+      updateSelectionPreview();
+      statusPanel.textContent = `تم تحديث الكمية إلى ${formatNumber(selectedQuantity)}.`;
+    });
+
+    addToBagButton.addEventListener("click", () => {
+      bagItems += selectedQuantity;
+      bagCount.textContent = formatNumber(bagItems);
+      statusPanel.textContent =
+        `تمت إضافة ${formatNumber(selectedQuantity)} قطعة من الثوب الأبيض الكلاسيكي بمقاس ${selectedSize} إلى السلة.`;
+    });
+
+    currentYear.textContent = formatNumber(new Date().getFullYear());
+    updateSelectionPreview();
+  </script>
+</body>
+</html>
+
+
+
+
+GPT-5.4
+
+Extra High
